@@ -5,24 +5,17 @@ export const authContext = createContext();
 
 export default function AuthContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [userLoggedIn, setUserLoggedIn] = useState(null);
 
-  const logout = () => {
-    const headerObj = { authorization: user.token };
-
-    axios
-      .post("http://localhost:9000/api/logout", null, {
-        headers: headerObj,
-      })
-      .then(function (response) {
-        console.log(response);
-        setIsLoggedIn(false);
-        setUser(null);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  const axiosWithAuth = () => {
+    const token = userLoggedIn.token;
+    return axios.create({
+      headers: {
+        Authorization: token,
+      },
+    });
   };
+
   const login = async (username, password) => {
     axios
       .post("http://localhost:9000/api/login", {
@@ -30,19 +23,38 @@ export default function AuthContextProvider({ children }) {
         password,
       })
       .then(function (response) {
+        setIsLoggedIn(true);
+        setUserLoggedIn(response.data);
         console.log(response);
-        isLoggedIn(true);
-        setUser(response.data);
       })
       .catch(function (error) {
         console.log(error);
       });
   };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setUserLoggedIn(null);
+
+    axiosWithAuth()
+      .post("http://localhost:9000/api/logout")
+      .then(function (response) {
+        setIsLoggedIn(false);
+        setUserLoggedIn(null);
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     login("workintech", "wecandoit");
   }, []);
   return (
-    <authContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <authContext.Provider
+      value={{ isLoggedIn, userLoggedIn, login, logout, axiosWithAuth }}
+    >
       {children}
     </authContext.Provider>
   );

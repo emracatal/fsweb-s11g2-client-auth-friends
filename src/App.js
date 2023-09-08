@@ -5,28 +5,16 @@ import FriendList from "./components/FriendList";
 import AddFriend from "./components/AddFriend";
 import Logout from "./components/Logout";
 import { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { authContext } from "./contexts/authContext";
 import { PrivateRoute } from "./components/PrivateRoute";
+import { Header } from "./components/Header";
+
 function App() {
   const { login, logout } = useContext(authContext);
   return (
     <div className="App">
+      <Header />
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/users">Users</Link>
-            </li>
-          </ul>
-        </nav>
-
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
